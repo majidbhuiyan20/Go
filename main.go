@@ -8,9 +8,23 @@ func add(num1 int, num2 int) int {
 	return sum
 }
 
+func getNumber(num1 int, num2 int) (int, int) {
+	sum := num1 + num2
+	mul := num1 * num2
+
+	return sum, mul
+}
+
 func main() {
 	fmt.Println("Hello Majid! Started Learning Go")
 
 	sum := add(10, 20)
 	fmt.Println(sum)
+
+	a := 20
+	b := 30
+
+	s, m := getNumber(a, b)
+	fmt.Println(s, m)
+
 }
