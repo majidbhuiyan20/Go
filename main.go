@@ -15,6 +15,13 @@ func getNumber(num1 int, num2 int) (int, int) {
 	return sum, mul
 }
 
+func printSomething() {
+	fmt.Println("Learn something with Habib vai")
+}
+func printWithString(name string) {
+	fmt.Println("Learn go Lang with ", name)
+}
+
 func main() {
 	fmt.Println("Hello Majid! Started Learning Go")
 
@@ -26,5 +33,8 @@ func main() {
 
 	s, m := getNumber(a, b)
 	fmt.Println(s, m)
+
+	printSomething()
+	printWithString("Habib vai")
 
 }
