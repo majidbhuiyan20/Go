@@ -14,8 +14,8 @@ func aboutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/hello", helloHandler)
+	mux := http.NewServeMux()              // mux call router
+	mux.HandleFunc("/hello", helloHandler) //hello is route
 	mux.HandleFunc("/about", aboutHandler)
 
 	fmt.Println("Server running on :3000")
