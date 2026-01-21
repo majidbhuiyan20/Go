@@ -1,4 +1,4 @@
-module test
+module GO
 
 go 1.25.1
 

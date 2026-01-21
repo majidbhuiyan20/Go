@@ -1,60 +1,51 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"log"
+	"net/http"
 
-func startLearning() {
-	fmt.Println("Hello Majid! Started Learning Go")
+	"github.com/gorilla/mux"
+)
+
+type Student struct {
+	ID     string `json:"ID"`
+	Name   string `json:"Name"`
+	School string `json:"School"`
 }
 
-func add(num1 int, num2 int) int {
-	sum := num1 + num2
-	fmt.Println("Sum is = ", sum)
-	return sum
+var students = []Student{
+	{Name: "Majid Bhuiyan", ID: "101", School: "Jawar High School"},
 }
 
-func getNumber(num1 int, num2 int) (int, int) {
-	sum := num1 + num2
-	mul := num1 * num2
-	fmt.Println("Sum is = ", sum)
-	fmt.Println("Mul is = ", mul)
-	return sum, mul
+func getStudents(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "Application/json")
+	json.NewEncoder(w).Encode(students)
 }
 
-func printSomething() {
-	fmt.Println("Learn something with Habib vai")
-}
+func createStudent(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "Application/json")
 
-func printWithString(name string) {
-	fmt.Println("Learn go Lang with ", name)
-}
+	var newStudent Student
 
-func nameInput() string {
-	var name string
-	fmt.Print("Enter Your Name - ")
-	fmt.Scan(&name)
-	fmt.Println("Your name is ", name)
-	return name
-}
+	err := json.NewDecoder(r.Body).Decode(&newStudent)
 
-func getTwoNumber() (int, int, int) {
-	var num1 int
-	var num2 int
-	fmt.Print("Enter first number - ")
-	fmt.Scan(&num1)
-	fmt.Print("Enter Second number - ")
-	fmt.Scan(&num2)
-	sum := num1 + num2
-	fmt.Println("Sumation is - ", sum)
-	return num1, num2, sum
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+
+	}
+	students = append(students, newStudent)
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(newStudent)
+
 }
 
 func main() {
-	startLearning()
-	add(10, 20)
-	getNumber(12, 12)
-	printSomething()
-	printWithString("Habib vai")
-	nameInput()
-	getTwoNumber()
+	r := mux.NewRouter()
 
+	r.HandleFunc("/students", getStudents).Methods("GET")
+	r.HandleFunc("/students", createStudent).Methods("POST")
+	log.Println("Server Running on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
