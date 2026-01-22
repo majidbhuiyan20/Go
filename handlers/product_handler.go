@@ -19,10 +19,10 @@ var products []model.Product
 func init() {
 	products = append(products, model.Product{
 		ID:          "1",
-		Name:        "Sample Product",
+		Name:        "Iphone 16 pro max",
 		Description: "This is a sample product",
-		Price:       9.99,
-		Image:       "uploads/sample.png", // place sample image if needed
+		Price:       999.99,
+		Image:       "uploads/iphone.jpg", // place sample image if needed
 	})
 }
 
