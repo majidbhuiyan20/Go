@@ -15,7 +15,6 @@ import (
 
 var products []model.Product
 
-// Initialize some products
 func init() {
 	products = append(products, model.Product{
 		ID:          "1",
@@ -26,13 +25,11 @@ func init() {
 	})
 }
 
-// GET all products
 func GetProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(products)
 }
 
-// POST product (handles both multipart/form-data with file OR JSON with image path)
 func CreateProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -44,7 +41,6 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// handle multipart/form-data upload
 func handleMultipartProduct(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(10 << 20) // 10 MB
 	if err != nil {
@@ -67,7 +63,6 @@ func handleMultipartProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get image file
 	file, handler, err := r.FormFile("image")
 	if err != nil {
 		http.Error(w, "Image required", http.StatusBadRequest)
@@ -75,10 +70,8 @@ func handleMultipartProduct(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	// Ensure uploads folder exists
 	os.MkdirAll("uploads", os.ModePerm)
 
-	// Unique image name
 	imageName := strconv.FormatInt(time.Now().UnixNano(), 10) + filepath.Ext(handler.Filename)
 	imagePath := "uploads/" + imageName
 
@@ -108,7 +101,6 @@ func handleMultipartProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(product)
 }
 
-// handle JSON input
 func handleJSONProduct(w http.ResponseWriter, r *http.Request) {
 	var product model.Product
 	err := json.NewDecoder(r.Body).Decode(&product)
@@ -122,7 +114,6 @@ func handleJSONProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Generate unique ID
 	product.ID = strconv.FormatInt(time.Now().UnixNano(), 10)
 
 	products = append(products, product)

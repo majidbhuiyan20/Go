@@ -3,19 +3,25 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"GO/routes"
+
 	"github.com/gorilla/mux"
 )
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	r := mux.NewRouter()
 
-	// Serve images
 	r.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
 
 	routes.RegisterProductRoutes(r)
 
-	log.Println("Server running on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Printf("Server running on port http://localhost:%s\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
