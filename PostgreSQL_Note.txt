@@ -1,0 +1,115 @@
+1.psql postgres => run SQL commands directly from your terminal
+2.CREATE DATABASE test; -- create a new database
+3. CREATE TABLE cars (
+  brand VARCHAR(255),
+  model VARCHAR(255),
+  year INT
+);
+=> Cretae a table named cars
+
+
+4. select * from cars;
+ brand | model | year 
+-------+-------+------
+(0 rows)
+=> initially show empty cars table
+
+
+5. insert into cars(brand, model, year) Values('Ford', 'Mustang',1964);
+=> Insert data into cars table
+
+6. select * from cars;
+ brand |  model  | year 
+-------+---------+------
+ Ford  | Mustang | 1964
+(1 row)
+
+6. INSERT INTO cars (brand, model, year)
+VALUES
+  ('Volvo', 'p1800', 1968),
+  ('BMW', 'M1', 1978),
+  ('Toyota', 'Celica', 1975);
+INSERT 0 3
+postgres=# select * from cars;
+ brand  |  model  | year 
+--------+---------+------
+ Ford   | Mustang | 1964
+ Volvo  | p1800   | 1968
+ BMW    | M1      | 1978
+ Toyota | Celica  | 1975
+(4 rows)
+
+=> insert here multiple data 
+
+7.select brand, year from cars;
+ brand  | year 
+--------+------
+ Ford   | 1964
+ Volvo  | 1968
+ BMW    | 1978
+ Toyota | 1975
+(4 rows)
+8. select model, brand, year from cars;
+  model  | brand  | year 
+---------+--------+------
+ Mustang | Ford   | 1964
+ p1800   | Volvo  | 1968
+ M1      | BMW    | 1978
+ Celica  | Toyota | 1975
+(4 rows)
+
+
+9. alter table cars add color varchar(255);
+ALTER TABLE
+postgres=# select * from cars;
+ brand  |  model  | year | color 
+--------+---------+------+-------
+ Ford   | Mustang | 1964 | 
+ Volvo  | p1800   | 1968 | 
+ BMW    | M1      | 1978 | 
+ Toyota | Celica  | 1975 | 
+(4 rows)
+
+=> In this section add new column in table section
+
+10. commad: update cars set color ='Red' where brand = 'Ford' and model = 'Mustang';
+UPDATE 1
+postgres=# select * from cars;
+ brand  |  model  | year | color 
+--------+---------+------+-------
+ Volvo  | p1800   | 1968 | 
+ BMW    | M1      | 1978 | 
+ Toyota | Celica  | 1975 | 
+ Ford   | Mustang | 1964 | Red
+(4 rows)
+
+=> in this section add value in specific column
+
+11. postgres=# select * from cars;
+ brand  |  model  | year | color 
+--------+---------+------+-------
+ Volvo  | p1800   | 1968 | Green
+ BMW    | M1      | 1978 | Green
+ Toyota | Celica  | 1975 | Green
+ Ford   | Mustang | 1964 | Green
+(4 rows)
+=> all color set is Green
+
+12. postgres=# UPDATE cars
+SET color = CASE
+    WHEN brand = 'Ford' AND model = 'Mustang' THEN 'Red'
+    WHEN brand = 'Volvo' AND model = 'p1800' THEN 'Blue'
+    WHEN brand = 'BMW' AND model = 'M1' THEN 'Black'
+    WHEN brand = 'Toyota' AND model = 'Celica' THEN 'Green'
+END;
+UPDATE 4
+postgres=# select * from cars;
+ brand  |  model  | year | color 
+--------+---------+------+-------
+ Volvo  | p1800   | 1968 | Blue
+ BMW    | M1      | 1978 | Black
+ Toyota | Celica  | 1975 | Green
+ Ford   | Mustang | 1964 | Red
+(4 rows)
+=>> Here update different color in one query
+
