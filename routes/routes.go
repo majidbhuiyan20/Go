@@ -10,18 +10,12 @@ func RegisterProductRoutes(r *mux.Router) {
 
 	// ---------------- Category Routes ----------------
 	r.HandleFunc("/admin/categories", handlers.CreateCategory).Methods("POST")
-	r.HandleFunc("/admin/categories/{id}", handlers.UpdateCategory).Methods("PUT")
-	r.HandleFunc("/admin/categories/{id}", handlers.DeleteCategory).Methods("DELETE")
 
-	r.HandleFunc("/categories", handlers.GetCategories).Methods("GET")
-	r.HandleFunc("/categories/{id}", handlers.GetCategoryById).Methods("GET")
+	// r.HandleFunc("/categories", handlers.GetCategories).Methods("GET")
 
 	// ---------------- Product Routes ----------------
-	r.HandleFunc("/admin/categories/{categoryId}/products", handlers.CreateProduct).Methods("POST")
-	r.HandleFunc("/admin/categories/{categoryId}/products/{productId}", handlers.UpdateProduct).Methods("PUT")
-	r.HandleFunc("/admin/categories/{categoryId}/products/{productId}", handlers.DeleteProduct).Methods("DELETE")
+	//r.HandleFunc("/admin/categories/{categoryId}/products", handlers.CreateProduct).Methods("POST")
 
-	r.HandleFunc("/categories/{categoryId}/products", handlers.GetProductsByCategory).Methods("GET")
 }
 
 // ------Api End POint Routes------
