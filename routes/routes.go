@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func RegisterRoutes(r *mux.Router) {
+func RegisterProductRoutes(r *mux.Router) {
 
 	// ---------------- Category Routes ----------------
 	r.HandleFunc("/admin/categories", handlers.CreateCategory).Methods("POST")
