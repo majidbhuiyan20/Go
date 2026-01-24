@@ -1,16 +1,17 @@
 package main
 
 import (
+	"GO/config"
+	"GO/routes"
 	"log"
 	"net/http"
 	"os"
-
-	"GO/routes"
 
 	"github.com/gorilla/mux"
 )
 
 func main() {
+	config.Init()
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
