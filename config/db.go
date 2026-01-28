@@ -12,7 +12,7 @@ var DB *sql.DB
 func Init() {
 	var err error
 	// Your PostgreSQL connection string
-	DB, err = sql.Open("pgx", "postgres://postgres:1234@localhost:5433/majiddb")
+	DB, err = sql.Open("pgx", "postgres://postgres:1234@localhost:5433/ecommerce_db")
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}

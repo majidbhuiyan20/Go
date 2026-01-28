@@ -10,20 +10,30 @@ import (
 	"time"
 )
 
-// ---------------- Admin ----------------
 func CreateCategory(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
 	var cat model.Category
 
 	err := json.NewDecoder(r.Body).Decode(&cat)
-	log.Println("Received Category:", cat)
 
-	if err != nil || cat.Name == "" {
-		http.Error(w, "Invalid Category Data", http.StatusBadRequest)
+	if err != nil {
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Invalid Reques Body",
+		})
 		return
 	}
 
-	// Insert into PostgreSQL
+	if cat.Name == "" {
+		w.WriteHeader(http.StatusBadGateway)
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Category name is required",
+		})
+		return
+	}
+
 	var id int
 	err = config.DB.QueryRow(
 		`INSERT INTO categories (name, image, created_at)
@@ -32,26 +42,37 @@ func CreateCategory(w http.ResponseWriter, r *http.Request) {
 	).Scan(&id)
 
 	if err != nil {
-		http.Error(w, "Failed to insert category", http.StatusInternalServerError)
-		log.Println("Insert error:", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("Insert error: ", err)
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Failed to create category",
+		})
 		return
 	}
 
 	cat.ID = strconv.Itoa(id)
 	cat.CreatedAt = time.Now().Unix()
-
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(cat)
+	json.NewEncoder(w).Encode(model.Response{
+		Success: true,
+		Message: "Category created Successfully",
+	})
+
 }
 
-// ---------------- End User ----------------
 func GetCategories(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	rows, err := config.DB.Query(`SELECT id, name, image, created_at FROM categories`)
+	rows, err := config.DB.Query(`SELECT id, name, image, created_at from categories order by id`)
+
 	if err != nil {
-		http.Error(w, "Failed to fetch categories", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
 		log.Println("Query error:", err)
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Failed to fetch catrgories",
+		})
 		return
 	}
 	defer rows.Close()
@@ -62,14 +83,22 @@ func GetCategories(w http.ResponseWriter, r *http.Request) {
 		var cat model.Category
 		var id int
 		err := rows.Scan(&id, &cat.Name, &cat.Image, &cat.CreatedAt)
+
 		if err != nil {
-			http.Error(w, "Failed to scan category", http.StatusInternalServerError)
-			log.Println("Scan error:", err)
+			w.WriteHeader((http.StatusInternalServerError))
+			log.Println("Scan error: ", err)
+			json.NewEncoder(w).Encode(model.Response{
+				Success: false,
+				Message: "Failed to scan category",
+			})
 			return
 		}
 		cat.ID = strconv.Itoa(id)
 		categories = append(categories, cat)
 	}
-
-	json.NewEncoder(w).Encode(categories)
+	json.NewEncoder(w).Encode(model.Response{
+		Success: true,
+		Message: "Categories fetch successfully",
+		Data:    categories,
+	})
 }

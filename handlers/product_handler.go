@@ -4,6 +4,7 @@ import (
 	"GO/config"
 	"GO/model"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -15,52 +16,46 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&prod)
 
-	if err != nil || prod.Name == "" || prod.CategoryID == "" || prod.Price <= 0 || prod.Stock < 0 {
-		http.Error(w, "Invalid Product Data", http.StatusBadRequest)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Invalid request body",
+		})
 		return
 	}
 
+	if prod.Name == "" || prod.CategoryID == "" || prod.Price == 0 || prod.Stock < 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Invalid Product data, name, category_id, price(>0)",
+		})
+		return
+
+	}
 	var id int
 
-	err = config.DB.QueryRow(
-		`INSERT INTO products (category_id, name, description, price, stock, image, created_at)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+	err = config.DB.QueryRow(`Insert into products(category_id, name, description, price, stock, image, created_at)
+		values ($1, $2, $3, $4, $5, $6, $7) returning id`,
 		prod.CategoryID, prod.Name, prod.Description, prod.Price, prod.Stock, prod.Image, time.Now().Unix(),
 	).Scan(&id)
 
 	if err != nil {
-		http.Error(w, "Failed to insert product", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("Insert error: ", err)
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Failed to create category",
+		})
 		return
 	}
-
 	prod.ID = strconv.Itoa(id)
 	prod.CreatedAt = time.Now().Unix()
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(prod)
-}
-
-func GetProducts(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	rows, err := config.DB.Query(`SELECT id, category_id, name, description, price, stock, image, created_at FROM products`)
-	if err != nil {
-		http.Error(w, "Failed to fetch products", http.StatusInternalServerError)
-		return
-	}
-	defer rows.Close()
-
-	products := []model.Product{}
-
-	for rows.Next() {
-		var prod model.Product
-		err := rows.Scan(&prod.ID, &prod.CategoryID, &prod.Name, &prod.Description, &prod.Price, &prod.Stock, &prod.Image, &prod.CreatedAt)
-		if err != nil {
-			http.Error(w, "Error scanning product", http.StatusInternalServerError)
-			return
-		}
-		products = append(products, prod)
-	}
-
-	json.NewEncoder(w).Encode(products)
+	json.NewEncoder(w).Encode(model.Response{
+		Success: true,
+		Message: "Product Created Successfully",
+	})
 }
