@@ -15,4 +15,6 @@ func RegisterProductRoutes(r *mux.Router) {
 	r.HandleFunc("/students", handlers.GetStudent).Methods("GET")
 
 	r.HandleFunc("/admin/products", handlers.CreateProduct).Methods("POST")
+	r.HandleFunc("/products/by-category", handlers.GetProductsByCategory).Methods("GET")
+
 }

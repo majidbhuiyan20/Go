@@ -59,3 +59,50 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 		Message: "Product Created Successfully",
 	})
 }
+
+func GetProductsByCategory(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	categoryIDStr := r.URL.Query().Get("category_id")
+	if categoryIDStr == "" {
+		http.Error(w, "category_id is required", http.StatusBadRequest)
+		return
+	}
+
+	categoryID, err := strconv.Atoi(categoryIDStr)
+	if err != nil {
+		http.Error(w, "invalid category_id", http.StatusBadRequest)
+		return
+	}
+
+	rows, err := config.DB.Query(`
+        SELECT id, category_id, name, description, price, stock, image, created_at
+        FROM products
+        WHERE category_id = $1
+    `, categoryID)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	products := []model.Product{}
+
+	for rows.Next() {
+		var p model.Product
+		rows.Scan(
+			&p.ID,
+			&p.CategoryID,
+			&p.Name,
+			&p.Description,
+			&p.Price,
+			&p.Stock,
+			&p.Image,
+			&p.CreatedAt,
+		)
+		products = append(products, p)
+	}
+
+	json.NewEncoder(w).Encode(products)
+}
