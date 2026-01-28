@@ -106,3 +106,53 @@ func GetProductsByCategory(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(products)
 }
+
+func GetAllProducts(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Define a slice to hold all products
+	var products []model.Product
+
+	// Query to fetch all products with category info
+	rows, err := config.DB.Query(`
+        SELECT 
+            p.id, p.category_id, p.name, p.description, p.price, p.stock, p.image, p.created_at
+        FROM products p
+        ORDER BY p.id;
+    `)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("Query error: ", err)
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Failed to fetch products",
+		})
+		return
+	}
+	defer rows.Close()
+
+	// Loop through the rows and scan data into Product struct
+	for rows.Next() {
+		var p model.Product
+		var id int
+		var categoryID int
+		err := rows.Scan(
+			&id, &categoryID, &p.Name, &p.Description, &p.Price, &p.Stock, &p.Image, &p.CreatedAt,
+		)
+		if err != nil {
+			log.Println("Scan error: ", err)
+			continue
+		}
+		p.ID = strconv.Itoa(id)
+		p.CategoryID = strconv.Itoa(categoryID)
+		products = append(products, p)
+	}
+
+	// Return the response
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(model.Response{
+		Success: true,
+		Message: "Products fetched successfully",
+		Data:    products,
+	})
+}
