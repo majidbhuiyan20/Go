@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 func CreateProduct(w http.ResponseWriter, r *http.Request) {
@@ -155,4 +157,24 @@ func GetAllProducts(w http.ResponseWriter, r *http.Request) {
 		Message: "Products fetched successfully",
 		Data:    products,
 	})
+}
+
+func UpdateProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	id, ok := params["id"]
+
+	if !ok {
+		http.Error(w, "Id is missing", http.StatusBadRequest)
+		return
+	}
+
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		http.Error(w, "Invalid id formet", http.StatusBadRequest)
+		return
+	}
+
+	var prod model.Product
+
 }
